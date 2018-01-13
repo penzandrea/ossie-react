@@ -2,27 +2,11 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-class ProductCategoryRow extends React.Component {
-    render() {
-        const category = this.props.category;
-        return (
-            <tr>
-                <th colSpan="4">
-                    {category}
-                </th>
-            </tr>
-        );
-    }
-}
+var _ = require('lodash');
 
 class ProductRow extends React.Component {
     render() {
         const product = this.props.product;
-        const name = product.stocked ?
-            product.key :
-            <span style={{color: 'red'}}>
-        {product.props.children.key}
-      </span>;
 
         return (
             <tr>
@@ -35,7 +19,6 @@ class ProductTable extends React.Component {
     render() {
         const filterText = this.props.filterText;
         const rows = [];
-        let lastCategory = null;
 
         this.props.products.forEach((product) => {
 
@@ -99,18 +82,19 @@ class Button extends React.Component {
                        txt={this.props.txt}
                        onClick={ this.filterActiveChange}>{this.props.txt}</button>
     }
-
 }
-;
+
 class SearchRule extends React.Component {
     constructor(props) {
         super(props);
         this.onFilterActiveChange = this.onFilterActiveChange.bind(this);
         //this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
     }
+
     onFilterActiveChange(e, parameter) {
         this.props.onFilterActiveChange(e, parameter);
     }
+
     handleFilterTextChange(e) {
         this.props.onFilterTextChange(e.target.value);
         console.log('e.target.value');
@@ -118,9 +102,13 @@ class SearchRule extends React.Component {
     }
 
     render() {
-        const filterRuleButtons = this.props.filterRules;
+        const filterRuleButtons = this.props.filter.rules;
+
         const rulesButtons = [];
-        let lastCategory = null;
+
+       /* console.log('filterRuleButtonss');
+        console.log(filterRuleButtons);
+        console.log(typeof filterRuleButtons);*/
 
         filterRuleButtons.forEach((buttonRule, i) => {
             rulesButtons.push(
@@ -144,9 +132,11 @@ class SearchComponent extends React.Component {
         this.onFilterActiveChange = this.onFilterActiveChange.bind(this);
         //this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
     }
+
     onFilterActiveChange(e, parameter) {
         this.props.onFilterActiveChange(e, parameter);
     }
+
     handleFilterTextChange(e) {
         this.props.onFilterTextChange(e.target.value);
         console.log('e.target.value');
@@ -154,7 +144,7 @@ class SearchComponent extends React.Component {
     }
 
     render() {
-        const filterComponentButtons = this.props.filterComponents;
+        const filterComponentButtons = this.props.filter.components;
         const buttons = [];
 
         filterComponentButtons.forEach((buttonComp, i) => {
@@ -183,16 +173,15 @@ class SearchSeverity extends React.Component {
         this.props.onFilterActiveChange(e, parameter);
     }
 
-    //filterSeverity={this.props.filterSeverity}
-    //filterSeverityActive={this.props.filterSeverityActive}
+    //filter={this.props.filter}
+    //filterActive={this.props.filterActive}
     //onSevFilterActiveChange={this.props.onSevFilterActiveChange}
 
     render() {
-        const filterSeverityButtons = this.props.filterSeverity;
+        const filterButtons = this.props.filter.severities;
         const buttons = [];
-        let lastCategory = null;
 
-        filterSeverityButtons.forEach((buttonSev, i) => {
+        filterButtons.forEach((buttonSev, i) => {
 
             buttons.push(
                 <Button txt={buttonSev} parameter="severity" key={i} onFilterActiveChange={this.onFilterActiveChange}/>
@@ -206,6 +195,87 @@ class SearchSeverity extends React.Component {
         );
     }
 }
+
+
+class Search extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.onFilterActiveChange = this.onFilterActiveChange.bind(this);
+    }
+
+    onFilterActiveChange(e, parameter) {
+        this.props.onFilterActiveChange(e, parameter);
+    }
+
+    render() {
+        let allFilterButtons = [];
+        allFilterButtons = this.props.filter;
+        console.log("- - - - - - - - - "+allFilterButtons + " - - - - - - - - -");
+        console.log(allFilterButtons);
+
+        const filterButtons = this.props.filter.severities;
+        const buttons = [];
+        // You want to do the check for undefined first. If you do it the other way round, it will generate an error if the array is undefined.
+        // https://stackoverflow.com/questions/24403732/check-if-array-is-empty-does-not-exist-js
+        if (allFilterButtons['severities'] === undefined || allFilterButtons['severities'].length == 0) {
+            // array empty or does not exist
+            console.log('leer');
+        } else {
+            console.log(allFilterButtons.severities.length);
+        }
+
+        for( let parameter in allFilterButtons){
+            console.log("- - - - - - - - - - - - - - - - - - -" + parameter);
+            if (allFilterButtons[parameter].length != 0){
+                buttons.push(
+                    <h3 key={parameter}>{parameter}</h3>
+                );
+                for( let key in allFilterButtons[parameter]) {
+
+                    //console.log(allFilterButtons[parameter][key]);
+                    //console.log(key + ' Button Component key');
+                    //console.log(uniqueKey + ' Button Component uniqueKey');
+
+                    buttons.push(
+                        <Button txt={allFilterButtons[parameter][key][1]} parameter={parameter} key={allFilterButtons[parameter][key][0]} onFilterActiveChange={this.onFilterActiveChange}/>
+                    );
+                }
+/*                buttons.push(
+                    <Button txt={buttonSev} parameter="severity" key={i} onFilterActiveChange={this.onFilterActiveChange}/>
+                );*/
+            }
+        };
+
+/*        allFilterButtons.forEach((filterparam, i) => {
+            console.log("- - - - - - - - - - - - - - - - - -" + i);
+        });*/
+        //console.log(allFilterButtons.length);
+        //console.log(allFilterButtons);
+
+        //console.log(allFilterButtons.severities);
+/*        allFilterButtons.forEach((filterparam, i) => {
+                console.log("- - - - - - - - - "+filterparam + " - - - - - - - - -");
+           buttons.push(
+                <Button txt={buttonSev} parameter="severity" key={i} onFilterActiveChange={this.onFilterActiveChange}/>
+            );
+        });*/
+
+/*        filterButtons.forEach((buttonSev, i) => {
+
+            buttons.push(
+                <Button txt={buttonSev} parameter="severity" key={i} onFilterActiveChange={this.onFilterActiveChange}/>
+            );
+        });*/
+
+        return (
+            <div>
+                <h2>ALL</h2>
+                {buttons}</div>
+        );
+    }
+}
+
 class SearchBarGrouped extends React.Component {
 
     constructor(props) {
@@ -221,22 +291,26 @@ class SearchBarGrouped extends React.Component {
     render() {
         return (
             <form>
-                <SearchSeverity filterSeverity={this.props.filterSeverity}
-                                filterSeverityActive={this.props.filterSeverityActive}
+                <Search filter={this.props.filter}
+                        filterActive={this.props.filterActive}
+                        onFilterActiveChange={this.onFilterActiveChange} />
+                { /*<SearchSeverity filter={this.props.filter}
+                                filterActive={this.props.filterActive}
                                 onFilterActiveChange={this.onFilterActiveChange}/>
-                <SearchComponent filterComponents={this.props.filterComponents}
+                <SearchComponent filter={this.props.filter}
                                  filterComponentActive={this.props.filterComponentActive}
                                  onFilterActiveChange={this.onFilterActiveChange}/>
-                <SearchRule filterRules={this.props.filterRules}
+                <SearchRule filter={this.props.filter}
                             filterRuleActive={this.props.filterRuleActive}
                             onFilterActiveChange={this.onFilterActiveChange}/>
-
+*/}
                 <input type="text" placeholder="Search..." value={this.props.filterText}
                        onChange={this.handleFilterTextChange}/>
             </form>
         );
     }
 }
+
 class SearchBar extends React.Component {
 
     constructor(props) {
@@ -279,23 +353,24 @@ class FilterableProductTable extends React.Component {
 
     handleFilterActiveChange(activeSevFilterSet) {
 
-        /*const filterSeverityButtons = this.props.filterSeverity;
+        /*const filterButtons = this.props.filter;
          const active = this.state.filterActiveS;
          let active = [];
 
-         filterSeverityButtons.forEach((buttonSev, i) => {
+         filterButtons.forEach((buttonSev, i) => {
 
          buttons.push(
          <button data-space={buttonSev}
          className={buttonSev}
          data-txt={buttonSev}
-         key={i} type="button" onClick={this.filterSeverityActiveChange}>{buttonSev}</button>
+         key={i} type="button" onClick={this.filterActiveChange}>{buttonSev}</button>
          );
          });*/
 
         this.setState({
             filterActiveS: activeSevFilterSet
         });
+        console.log(activeSevFilterSet);
     }
 
 
@@ -312,10 +387,9 @@ class FilterableProductTable extends React.Component {
                     To get started, edit <code>src/App.js</code> and save to reload.
                 </p>
                 <SearchBar filterText={this.state.filterText} onFilterTextChange={this.handleFilterTextChange}/>
-                <SearchBarGrouped filterSeverity={this.props.filterSeverity}
-                                  filterSeverityActive={this.state.filterActiveS}
-                                  onFilterActiveChange={this.handleFilterActiveChange}
-                                  filterComponents={this.props.filterComponents} filterRules={this.props.filterRules}/>
+                <SearchBarGrouped filter={this.props.filter}
+                                  filterActive={this.state.filterActiveS}
+                                  onFilterActiveChange={this.handleFilterActiveChange}/>
                 <ProductTable products={this.props.products} filterText={this.state.filterText}/>
             </div>
         );
@@ -330,6 +404,11 @@ class App extends Component {
             severityFilter: [],
             ruleFilter: [],
             componentFilter: [],
+            filterArray: {
+                severities: [],
+                rules: [],
+                components: []
+            },
         };
     }
 
@@ -361,29 +440,61 @@ class App extends Component {
                 return (
                     issue.component
                 )
-            })
+            });
             this.setState({data: issues});
             //ES6 only https://stackoverflow.com/questions/1960473/get-all-unique-values-in-an-array-remove-duplicates
-            var uniqueSeverities = severities.filter((v, i, a) => a.indexOf(v) === i);
-            var uniqueRules = rules.filter((v, i, a) => a.indexOf(v) === i);
-            var uniqueComponents = components.filter((v, i, a) => a.indexOf(v) === i);
+            const uniqueSeverities = severities.filter((v, i, a) => a.indexOf(v) === i);
+            const uniqueRules = rules.filter((v, i, a) => a.indexOf(v) === i);
+            const uniqueComponents = components.filter((v, i, a) => a.indexOf(v) === i);
 
-            /*console.log(data);
-             console.log(this.state.data);
-             console.log('uniqueSeverities');
-             console.log(uniqueSeverities);*/
+
+
+            //console.log(uniqueSeverities);
+
+            for ( var item in uniqueSeverities){
+                var uniqueKey = _.uniqueId();
+
+                console.log(item);
+                uniqueSeverities[item] = [uniqueKey, uniqueSeverities[item]];
+            }
+
+            //console.log(uniqueSeverities);
+
+            //console.log(uniqueRules);
+
+            for ( var item in uniqueRules){
+                var uniqueKey = _.uniqueId();
+
+                console.log(item);
+                uniqueRules[item] = [uniqueKey, uniqueRules[item]];
+            }
+
+            //console.log(uniqueRules);
+
+
+            for ( var item in uniqueComponents){
+                var uniqueKey = _.uniqueId();
+
+                console.log(item);
+                uniqueComponents[item] = [uniqueKey, uniqueComponents[item]];
+            }
+
+            const filterArray = {};
+
+            filterArray.severities = uniqueSeverities;
+            filterArray.rules = uniqueRules;
+            filterArray.components = uniqueComponents;
+
             this.setState({severityFilter: uniqueSeverities});
             this.setState({ruleFilter: uniqueRules});
             this.setState({componentFilter: uniqueComponents});
-
+            this.setState({filterArray: filterArray});
         })
     }
 
     render() {
         return (
-            <FilterableProductTable products={this.state.data} filterSeverity={this.state.severityFilter}
-                                    filterComponents={this.state.componentFilter}
-                                    filterRules={this.state.ruleFilter}/>);
+            <FilterableProductTable products={this.state.data} filter={this.state.filterArray}/>);
     }
 }
 
